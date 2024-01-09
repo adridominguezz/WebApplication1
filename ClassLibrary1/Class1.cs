@@ -93,7 +93,8 @@ namespace ClassLibrary1
             userparam.Add(new KeyValuePair<string?, dynamic>("@idNegocio", user_to_create.idNegocio));
             userparam.Add(new KeyValuePair<string?, dynamic>("@Validated", user_to_create.validated));
             DataSet ds = queryGenericStored("svp_users_create", userparam);
-            send("a.dominguez@cesjuanpablosegundocadiz.es", "bsxp exoe pfry bnko", "j.gonzalez@cesjuanpablosegundocadiz.es", "hola", "holita");
+            String asunto = "Bienvenido " + user_to_create.Users;
+            send("a.dominguez@cesjuanpablosegundocadiz.es", "bsxp exoe pfry bnko", user_to_create.email, asunto, "Usuario creado con éxito");
 
         }
         public void UpdateUsers(User user_to_update)
