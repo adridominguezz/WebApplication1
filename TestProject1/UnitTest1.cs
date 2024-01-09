@@ -1,4 +1,6 @@
 using ClassLibrary1;
+using QuestPDF.Infrastructure;
+
 namespace TestProject1
    
 {
@@ -36,6 +38,12 @@ namespace TestProject1
             t.conect(true);
             t.DeleteUsers(new User() { Users = "Pedro" });
 
+        }
+        [TestMethod]
+        public void TestPDF()
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+            new PDFGenerate().generar("Bienvenido");
         }
     }
 }

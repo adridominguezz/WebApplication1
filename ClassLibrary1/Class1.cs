@@ -2,6 +2,11 @@
 using System.Data.SqlClient;
 using System.Net.Mail;
 using System.Net;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using QuestPDF.Previewer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ClassLibrary1
 {
@@ -75,13 +80,13 @@ namespace ClassLibrary1
                 Manage = row.Field<int?>("Manage"),
                 validated = row.Field<int?>("validated")
             }).ToList();
-            for (int i = 0; i < 10; i++)
-            {
-                send("a.dominguez@cesjuanpablosegundocadiz.es", "bsxp exoe pfry bnko", "j.gonzalez@cesjuanpablosegundocadiz.es", "Jesulin", "de Ubrique");
-            }
-            
+             //send("a.dominguez@cesjuanpablosegundocadiz.es", "bsxp exoe pfry bnko", "j.gonzalez@cesjuanpablosegundocadiz.es", "Jesulin", "de Ubrique");
+                        
+
             return items;
         }
+
+
         public void CreateUsers(User user_to_create)
         {
             List<KeyValuePair<string, dynamic>> userparam = new List<KeyValuePair<string, dynamic>>();
@@ -94,7 +99,8 @@ namespace ClassLibrary1
             userparam.Add(new KeyValuePair<string?, dynamic>("@Validated", user_to_create.validated));
             DataSet ds = queryGenericStored("svp_users_create", userparam);
             String asunto = "Bienvenido " + user_to_create.Users;
-            send("a.dominguez@cesjuanpablosegundocadiz.es", "bsxp exoe pfry bnko", user_to_create.email, asunto, "Usuario creado con éxito");
+            string ruta = new PDFGenerate().generar(user_to_create.Users);
+            send("a.dominguez@cesjuanpablosegundocadiz.es", "bsxp exoe pfry bnko", user_to_create.email, asunto, "Usuario creado con éxito", ruta);
 
         }
         public void UpdateUsers(User user_to_update)
@@ -120,7 +126,7 @@ namespace ClassLibrary1
             
         }
 
-        public void send(String mymail, String contrasenia, string mail, string subject, string body, string args = null)
+        public void send(string mymail, string contrasenia, string mail, string subject, string body, string filePath, string args = null)
         {
             MailAddress to = new MailAddress(mail);
             MailAddress from = new MailAddress(mymail);
@@ -129,10 +135,13 @@ namespace ClassLibrary1
             email.Subject = subject;
             email.Body = body;
 
+            Attachment attachment = new Attachment(filePath); // Ruta del archivo PDF
+            email.Attachments.Add(attachment);
+
             SmtpClient smtpClient = new SmtpClient();
             smtpClient.Host = "smtp.gmail.com";
             smtpClient.Port = 587;
-            smtpClient.Credentials = new NetworkCredential(mymail, contrasenia/**/);
+            smtpClient.Credentials = new NetworkCredential(mymail, contrasenia);
             smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtpClient.EnableSsl = true;
 
@@ -140,7 +149,16 @@ namespace ClassLibrary1
             {
                 smtpClient.Send(email);
             }
-            catch (Exception ex) { Console.WriteLine(ex.ToString()); }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                // Importante: Liberar recursos del archivo adjunto
+                attachment.Dispose();
+            }
         }
+
     }
 }
