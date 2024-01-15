@@ -13,7 +13,7 @@ namespace ClassLibrary1
     
     public class Class1
     {
-        public SqlConnection conec { get; set; }
+        public static SqlConnection? conec { get; set; }
 
       
         public void conect(bool auth)
@@ -80,7 +80,6 @@ namespace ClassLibrary1
                 Manage = row.Field<int?>("Manage"),
                 validated = row.Field<int?>("validated")
             }).ToList();
-             //send("a.dominguez@cesjuanpablosegundocadiz.es", "bsxp exoe pfry bnko", "j.gonzalez@cesjuanpablosegundocadiz.es", "Jesulin", "de Ubrique");
                         
 
             return items;

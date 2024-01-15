@@ -16,6 +16,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+ClassLibrary1.Class1 con = new ClassLibrary1.Class1();
+
+con.conect(true);
+    
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
