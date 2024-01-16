@@ -5,6 +5,7 @@ using System;
 using System.Xml.Linq;
 using System.Net.Mail;
 using System.Net;
+using ClassLibrary1.PostgreDataStruct;
 
 namespace WebApiCore.Controllers
 {
@@ -13,6 +14,7 @@ namespace WebApiCore.Controllers
     public class UserController : ControllerBase
     {
         private Class1 accessSql = new Class1();
+        private PostgreeCon postgreeCon = new PostgreeCon();
         private ILogger<UserController> _logger;
 
         public UserController(ILogger<UserController> logger)
@@ -21,20 +23,43 @@ namespace WebApiCore.Controllers
         }
 
         [HttpGet(Name = "GetUser")]
-        public IList<User> Get(String name, String passw)
+        public IList<User> Get(String name, String passw, String email)
         {
             accessSql.conect(true);
+            postgreeCon.IniciarCon();
+
             User user = new User() { Users = name, pass = passw};
+            String consulta = "select * from usuario where email like " + email;
+            postgreeCon.ConsultaTest<UsuarioPostGre>(" select  * from usuario where email like \"" + email+ "\"");
+            //postgreeCon.ConsultaTest<UsuarioPostGre>(consulta);
             IList<User> uss = accessSql.GetUsers(user);
             return uss;
         }
 
         [HttpPost(Name = "PostUser")]
-        public void Post([FromBody] UserIgnore usuario) 
+        public void Post(String name, String password, String email, int? Admin, int? Manag, int? idNego, int? valid, String? imagen) 
         {
             accessSql.conect(true);
-            User uss = new User { Users = usuario.Users, pass = usuario.pass, email = usuario.email };
-            accessSql.CreateUsers(uss);
+            postgreeCon.IniciarCon();
+
+            User user = new User()
+            {
+                Users = name,
+                pass = password,
+                email = email,
+                Administrador = Admin,
+                Manage = Manag,
+                idNegocio = idNego,
+                validated = valid
+            };
+
+            string imageUrl = imagen; 
+
+            // Convierte la imagen a Base64
+            string base64String = ConvertImageToBase64(imageUrl);
+
+            accessSql.CreateUsers(user);
+            postgreeCon.InsertTest<UsuarioPostGre>("usuario", new UsuarioPostGre() { email = email, imagenusuario = new imagen() { cabezera = "Foto", imgbase = base64String  } });
         }
 
 
@@ -66,7 +91,29 @@ namespace WebApiCore.Controllers
             accessSql.DeleteUsers(user);
         }
 
-        
-        
+
+        static string ConvertImageToBase64(string imageUrl)
+        {
+            try
+            {
+                using (WebClient webClient = new WebClient())
+                {
+                    // Descarga la imagen desde la URL
+                    byte[] imageBytes = webClient.DownloadData(imageUrl);
+
+                    // Convierte los bytes a Base64
+                    string base64String = Convert.ToBase64String(imageBytes);
+
+                    return base64String;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al convertir la imagen a Base64: {ex.Message}");
+                return null;
+            }
+        }
+
+
     }
 }
