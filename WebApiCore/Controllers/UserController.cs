@@ -23,18 +23,30 @@ namespace WebApiCore.Controllers
         }
 
         [HttpGet(Name = "GetUser")]
-        public IList<User> Get(String name, String passw, String email)
+        public User Get(String name, String passw, String email)
         {
             accessSql.conect(true);
             postgreeCon.IniciarCon();
 
-            User user = new User() { Users = name, pass = passw};
-            String consulta = "select * from usuario where email like " + email;
-            postgreeCon.ConsultaTest<UsuarioPostGre>(" select  * from usuario where email like \"" + email+ "\"");
-            //postgreeCon.ConsultaTest<UsuarioPostGre>(consulta);
-            IList<User> uss = accessSql.GetUsers(user);
+            User user = new User() { Users = name, pass = passw };
+            UsuarioPostGre usuarioPostGre = new UsuarioPostGre();
+            String consulta = "select * from usuario where email = @Email";
+
+
+            //postgreeCon.ConsultaTest<UsuarioPostGre>(consulta, new { Email = email });
+            //IList<UsuarioPostGre> lista = postgreeCon.ConsultaTest<UsuarioPostGre>(consulta, new { Email = email });
+            
+
+
+            User uss = accessSql.GetUsers(user)[0];
+
+            uss.UsuarioPostGre = postgreeCon.ConsultaTest<UsuarioPostGre>($" select  * from usuario where email like '%{email}%'")[0];
+            
+
+
             return uss;
         }
+
 
         [HttpPost(Name = "PostUser")]
         public void Post(String name, String password, String email, int? Admin, int? Manag, int? idNego, int? valid, String? imagen) 

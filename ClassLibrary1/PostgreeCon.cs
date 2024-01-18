@@ -21,9 +21,19 @@ namespace ClassLibrary1
             dataSourceBuilder.MapComposite<imagen>();
             dataSource = dataSourceBuilder.Build();
         }
-        public List<T> ConsultaTest<T>(string consulta) where T : new()
+        public List<T> ConsultaTest<T>(string consulta, object parameters = null) where T : new()
         {
             using var command = dataSource.CreateCommand(consulta);
+
+            // Agregar parámetros si se proporcionan
+            if (parameters != null)
+            {
+                foreach (var property in parameters.GetType().GetProperties())
+                {
+                    command.Parameters.AddWithValue("@" + property.Name, property.GetValue(parameters, null));
+                }
+            }
+
             using var reader = command.ExecuteReader();
             List<T> result = new List<T>();
 
@@ -35,17 +45,13 @@ namespace ClassLibrary1
                 int count = 0;
                 foreach (var itemprop in prop)
                 {
-
                     var tipon = reader.GetPostgresType(count);
                     Type o = itemprop.PropertyType;
                     MethodInfo method = reader.GetType().GetMethod("GetFieldValue")
-                             .MakeGenericMethod(new Type[] { o });
+                            .MakeGenericMethod(new Type[] { o });
                     object? r = method.Invoke(reader, new object[] { count });
 
-
                     itemprop.SetValue(DatoInterno, r);
-
-
                     count++;
                 }
                 result.Add(DatoInterno);
@@ -53,7 +59,8 @@ namespace ClassLibrary1
             return result;
         }
 
-       
+
+
 
         public void InsertTest<T>(string tabla, T DatosEscritura) where T : new()
         {
