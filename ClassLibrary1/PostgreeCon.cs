@@ -19,6 +19,7 @@ namespace ClassLibrary1
             dataSource = NpgsqlDataSource.Create(connectionString);
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
             dataSourceBuilder.MapComposite<imagen>();
+            dataSourceBuilder.MapComposite<proveedor>();
             dataSource = dataSourceBuilder.Build();
         }
         public List<T> ConsultaTest<T>(string consulta, object parameters = null) where T : new()
@@ -59,6 +60,64 @@ namespace ClassLibrary1
             return result;
         }
 
+        public List<T> ConsultaTest<T>(string tabla, T datofiltro) where T : new()
+        {
+
+            string consulta = string.Format("Select * from {0}", tabla);
+
+            Type tin = datofiltro.GetType(); 
+            PropertyInfo[] propcons = tin.GetProperties();
+
+
+            string wherecondition = string.Format(" where ");
+            foreach (var itemprop in propcons)
+            {
+                
+                var objreaded = itemprop.GetValue(datofiltro);
+                if (objreaded != null)
+                {
+                    if (itemprop.PropertyType == Type.GetType("System.String"))
+                    {
+                        wherecondition = string.Format("{0} {1} = '{2}'", wherecondition, itemprop.Name, objreaded);
+                    }
+                    else
+                    {
+                        wherecondition = string.Format("{0} {1} = '{2}'", wherecondition, itemprop.Name, objreaded);
+                    }
+                }
+            }
+           
+
+
+            using var command = dataSource.CreateCommand(consulta + wherecondition);
+            using var reader = command.ExecuteReader();
+            List<T> result = new List<T>();
+
+            while (reader.Read())
+            {
+                T DatoInterno = new T();
+                Type t = DatoInterno.GetType();
+                PropertyInfo[] prop = t.GetProperties();
+                int count = 0;
+                foreach (var itemprop in prop)
+                {
+
+                    var tipon = reader.GetPostgresType(count);
+                    Type o = itemprop.PropertyType;
+                    MethodInfo method = reader.GetType().GetMethod("GetFieldValue")
+                             .MakeGenericMethod(new Type[] { o });
+                    object? r = method.Invoke(reader, new object[] { count });
+
+
+                    itemprop.SetValue(DatoInterno, r);
+
+
+                    count++;
+                }
+                result.Add(DatoInterno);
+            }
+            return result;
+        }
 
 
 

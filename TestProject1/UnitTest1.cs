@@ -10,28 +10,28 @@ namespace TestProject1
         [TestMethod]       
         public void TestConectionUserGet()
         {
-            Class1 t = new Class1();
+            SQLconn t = new SQLconn();
             t.GetUsers(new User() { Users = "Chemaria", pass = "1192" }); 
         }
 
         [TestMethod]
         public void TestConectionUserCreate()
         {
-            Class1 t = new Class1();
+            SQLconn t = new SQLconn();
             t.CreateUsers(new User() { Users = "Chemaria", pass = "1192", email = "chemaria@email.com", Administrador = 1, idNegocio=1, Manage = 1, validated = 1 });
         }
 
         [TestMethod]
         public void TestConectionUserUpdate()
         {
-            Class1 t = new Class1();
+            SQLconn t = new SQLconn();
             t.UpdateUsers(new User() { Users = "Pedro", pass = "8942" });
         }
 
         [TestMethod]
         public void TestConectionUserDelete()
         {
-            Class1 t = new Class1();
+            SQLconn t = new SQLconn();
             t.DeleteUsers(new User() { Users = "Pedro" });
 
         }
@@ -41,5 +41,9 @@ namespace TestProject1
             QuestPDF.Settings.License = LicenseType.Community;
             new PDFGenerate().generar("Bienvenido");
         }
+
+        
+
+
     }
 }

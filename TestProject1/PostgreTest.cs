@@ -27,6 +27,13 @@ namespace TestDB
 
         }
 
+        [TestMethod]
+        public void TestConecxionDBEjercicioClase()
+        {
+            PostgreeCon Con = new PostgreeCon();
+            Con.IniciarCon();
+            Assert.AreEqual("Chema", Con.ConsultaTest<inventario>("inventario", new inventario() { codigo = "1233" })[0].proveedor.nombreprov);
+        }
 
     }
 }

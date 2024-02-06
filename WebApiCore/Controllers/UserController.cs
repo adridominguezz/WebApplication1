@@ -13,7 +13,7 @@ namespace WebApiCore.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private Class1 accessSql = new Class1();
+        private SQLconn  accessSql = new SQLconn();
         private PostgreeCon postgreeCon = new PostgreeCon();
         private ILogger<UserController> _logger;
 

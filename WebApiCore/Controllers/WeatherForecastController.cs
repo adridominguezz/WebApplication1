@@ -33,7 +33,7 @@ namespace WebApiCore.Controllers
         //}
         public int Get()
         {
-            Class1 t = new ClassLibrary1.Class1();
+            SQLconn t = new ClassLibrary1.SQLconn();
             return t.TestDB().Tables[0].Rows.Count;
         }
 

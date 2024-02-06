@@ -15,7 +15,7 @@ namespace ClassLibrary1
         public string generar(string nombreDocumento)
         {
             QuestPDF.Settings.License = LicenseType.Community;
-
+            string name = nombreDocumento;
             nombreDocumento += ".pdf";
             string rutaCompleta = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), nombreDocumento);
 
@@ -29,24 +29,25 @@ namespace ClassLibrary1
                     page.DefaultTextStyle(x => x.FontSize(20));
 
                     page.Header()
-                        .Text("Bienvenido, usuario registrado con éxito.")
-                        .SemiBold().FontSize(36).FontColor(Colors.Blue.Medium);
+                        .Text("Bienvenido " + name + ", has sido registrado con éxito.")
+                        .SemiBold().FontSize(38).FontColor(Colors.Red.Medium);
                     
                     page.Content()
+                        
                         .PaddingVertical(1, Unit.Centimetre)
                         .Column(x =>
                        {
-                           x.Spacing(20);
-
+                           x.Spacing(10);
+                           x.Item().Text("Ignacio ponte el 10.");
                            x.Item().Text(Placeholders.LoremIpsum());
-                           x.Item().Image(Placeholders.Image(200, 100));
+                           x.Item().Image(Placeholders.Image(150, 70));
                        });
 
                     page.Footer()
                         .AlignCenter()
                         .Text(x =>
                         {
-                            x.Span("Page ");
+                            x.Span("Pagina ");
                             x.CurrentPageNumber();
                         });
                 });

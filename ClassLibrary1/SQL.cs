@@ -7,11 +7,12 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using QuestPDF.Previewer;
 using Microsoft.AspNetCore.Mvc;
+using ClassLibrary1.PostgreDataStruct;
 
 namespace ClassLibrary1
 {
     
-    public class Class1
+    public class SQLconn
     {
         public static SqlConnection? conec { get; set; }
 
@@ -23,6 +24,8 @@ namespace ClassLibrary1
             conec.ConnectionString = "Integrated Security=SSPI;Persist Security Info=False;Data Source=ADRI-PORTATIL; Initial Catalog=webAPI";
             conec.Open();
         }
+
+        
 
         public DataSet TestDB()
         {
@@ -81,7 +84,6 @@ namespace ClassLibrary1
                 validated = row.Field<int?>("validated")
             }).ToList();
                         
-
             return items;
         }
 
@@ -159,5 +161,57 @@ namespace ClassLibrary1
             }
         }
 
+
+
+        public IList<Libro> Getlibros(Libro book_to_search)
+        {
+            List<KeyValuePair<string, dynamic>> userparam = new List<KeyValuePair<string, dynamic>>();
+            //userparam.Add(new KeyValuePair<string, dynamic>("@titulo", book_to_search.titulo));
+            //userparam.Add(new KeyValuePair<string, dynamic>("@autor", book_to_search.autor));
+            userparam.Add(new KeyValuePair<string, dynamic>("@year", book_to_search.year.ToString()));
+            DataSet ds = queryGenericStored("svp_libro_get", userparam);
+            
+            IList<Libro> items = ds.Tables[0].AsEnumerable().Select(row =>
+            new Libro
+            {
+                titulo = row.Field<string>("titulo"),
+                autor = row.Field<string>("autor"),
+                year = row.Field<int>("year")
+            }).ToList();
+
+
+            return items;
+        }
+
+        public void CreateLibro(Libro libro_to_create)
+        {
+            List<KeyValuePair<string, dynamic>> userparam = new List<KeyValuePair<string, dynamic>>();
+            userparam.Add(new KeyValuePair<string, dynamic>("@titulo", libro_to_create.titulo));
+            userparam.Add(new KeyValuePair<string, dynamic>("@autor", libro_to_create.autor));
+            userparam.Add(new KeyValuePair<string?, dynamic>("@year", libro_to_create.year));
+            DataSet ds = queryGenericStored("svp_libro_create", userparam);
+
+           
+        }
+
+        public void UpdateLibro(Libro libro_to_update)
+        {
+            List<KeyValuePair<string, dynamic>> userparam = new List<KeyValuePair<string, dynamic>>();
+            userparam.Add(new KeyValuePair<string, dynamic>("@Newtitulo", libro_to_update.titulo));
+            userparam.Add(new KeyValuePair<string, dynamic>("@Newautor", libro_to_update.autor));
+            userparam.Add(new KeyValuePair<string, dynamic>("@Newyear", libro_to_update.year));
+            DataSet ds = queryGenericStored("svp_libro_update", userparam);
+
+
+        }
+
+        public void DeleteLibro(Libro libro_to_delete)
+        {
+            List<KeyValuePair<string, dynamic>> userparam = new List<KeyValuePair<string, dynamic>>();
+            userparam.Add(new KeyValuePair<string, dynamic>("@titulo", libro_to_delete.titulo));
+
+            DataSet ds = queryGenericStored("svp_libro_delete", userparam);
+
+        }
     }
 }

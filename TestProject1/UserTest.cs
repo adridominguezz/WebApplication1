@@ -12,7 +12,7 @@ namespace ClassLibrary1
         public void TestConectionUSer()
         {
 
-            Class1 t = new Class1();
+            SQLconn t = new SQLconn();
             t.conect(true);
             t.GetUsers(new User() { Users = "Juan"});
             //Assert.AreEqual()
